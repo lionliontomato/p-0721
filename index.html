@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f7f7f7">
-  <title>地瓜瓜小天地</title>
-  <link id="site-favicon" rel="icon" href="https://lionliontomato.github.io/potato/favicon.ico">
+  <title>地瓜小天地</title>
+  <link id="site-favicon" rel="icon" type="image/svg+xml" href="./favicon.svg">
   <style>
     * { box-sizing: border-box; }
     html, body { width: 100%; height: 100%; margin: 0; }
@@ -98,9 +98,9 @@
 </head>
 <body>
   <nav class="switcher" aria-label="網站切換">
-    <span class="brand">POTATO × PTM</span>
-    <button class="tab" id="tab-potato" type="button" aria-pressed="true">地瓜瓜の歌單</button>
-    <button class="tab" id="tab-ptm" type="button" aria-pressed="false">地瓜瓜の存歌存鑽</button>
+    <span class="brand">地瓜小天地</span>
+    <button class="tab" id="tab-potato" type="button" aria-pressed="true">Potato</button>
+    <button class="tab" id="tab-ptm" type="button" aria-pressed="false">PTM</button>
     <a class="open-original" id="open-original" href="https://lionliontomato.github.io/potato/" target="_blank" rel="noopener">另開原網站 ↗</a>
   </nav>
   <main class="frame-wrap">
@@ -116,61 +116,22 @@
           url: "https://lionliontomato.github.io/potato/",
           label: "Potato",
           title: "Potato 網站內容",
-          faviconCandidates: [
-            "https://lionliontomato.github.io/potato/favicon.ico",
-            "https://lionliontomato.github.io/potato/favicon.svg",
-            "https://lionliontomato.github.io/potato/favicon.png",
-            "https://lionliontomato.github.io/potato/assets/favicon.ico",
-            "https://lionliontomato.github.io/potato/assets/favicon.svg",
-            "https://lionliontomato.github.io/potato/images/favicon.png",
-            "https://lionliontomato.github.io/potato/apple-touch-icon.png"
-          ]
         },
         ptm: {
           url: "https://lionliontomato.github.io/PTM/",
           label: "PTM",
           title: "PTM 網站內容",
-          faviconCandidates: [
-            "https://lionliontomato.github.io/PTM/favicon.ico",
-            "https://lionliontomato.github.io/PTM/favicon.svg",
-            "https://lionliontomato.github.io/PTM/favicon.png",
-            "https://lionliontomato.github.io/PTM/assets/favicon.ico",
-            "https://lionliontomato.github.io/PTM/assets/favicon.svg",
-            "https://lionliontomato.github.io/PTM/images/favicon.png",
-            "https://lionliontomato.github.io/PTM/apple-touch-icon.png"
-          ]
         }
       };
 
       const frame = document.getElementById("site-frame");
       const loading = document.getElementById("loading");
-      const favicon = document.getElementById("site-favicon");
       const openOriginal = document.getElementById("open-original");
       const tabs = {
         potato: document.getElementById("tab-potato"),
         ptm: document.getElementById("tab-ptm")
       };
       let activeKey = "potato";
-      let faviconProbeToken = 0;
-
-      function setFavicon(key) {
-        const token = ++faviconProbeToken;
-        const candidates = sites[key].faviconCandidates;
-        let index = 0;
-
-        function tryNext() {
-          if (token !== faviconProbeToken || index >= candidates.length) return;
-          const candidate = candidates[index++];
-          const probe = new Image();
-          probe.onload = function () {
-            if (token !== faviconProbeToken) return;
-            favicon.href = candidate;
-          };
-          probe.onerror = tryNext;
-          probe.src = candidate;
-        }
-        tryNext();
-      }
 
       function switchSite(key) {
         if (!sites[key] || key === activeKey) return;
@@ -182,7 +143,6 @@
         openOriginal.href = site.url;
         tabs.potato.setAttribute("aria-pressed", String(key === "potato"));
         tabs.ptm.setAttribute("aria-pressed", String(key === "ptm"));
-        setFavicon(key);
       }
 
       frame.addEventListener("load", function () {
@@ -190,7 +150,6 @@
       });
       tabs.potato.addEventListener("click", function () { switchSite("potato"); });
       tabs.ptm.addEventListener("click", function () { switchSite("ptm"); });
-      setFavicon("potato");
     }());
   </script>
 </body>

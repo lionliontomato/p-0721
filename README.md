@@ -1,7 +1,8 @@
-# Potato × PTM 整合版
+# 地瓜小天地｜Potato × PTM 整合版
 
 ## 內容
 - `index.html`：單一入口，可在 Potato 與 PTM 兩個原網站間切換。
+- `favicon.svg`：統一使用的地瓜圖示，切換頁面時不會改變。
 - `.nojekyll`：GitHub Pages 靜態檔案設定。
 
 ## 上傳 GitHub Pages
@@ -19,7 +20,7 @@
 因此不會複製或重寫兩個原網站的 HTML/CSS/JavaScript；原網站的字體、版面、圖片、動畫、功能及各自的試算表更新方式由原網站維持。兩個原網站必須持續公開且可正常使用。
 
 ## 網頁圖示
-切換時會依序嘗試該網站常見的 Favicon 路徑（favicon.ico、favicon.svg、favicon.png、assets/favicon.*、images/favicon.png、apple-touch-icon.png）。若原網站使用自訂檔名或非標準路徑，請將該圖示路徑補進 `index.html` 對應網站的 `faviconCandidates` 清單。
+整合網站統一使用根目錄的 `favicon.svg`（地瓜圖示）。不會隨 Potato／PTM 頁面切換而改變，因此瀏覽器分頁圖示會保持一致。
 
 ## 注意
 - 此 ZIP 不會修改原本兩個網站或 Google 試算表。
