@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7f7">
+  <title>Potato × PTM</title>
+  <link id="site-favicon" rel="icon" href="https://lionliontomato.github.io/potato/favicon.ico">
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
+    body {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #f7f7f7;
+      color: #333;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .switcher {
+      position: relative;
+      z-index: 2;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 58px;
+      padding: 8px 14px;
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid rgba(0,0,0,.08);
+      box-shadow: 0 2px 10px rgba(0,0,0,.04);
+    }
+    .brand {
+      margin-right: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      white-space: nowrap;
+    }
+    .tab {
+      appearance: none;
+      border: 1px solid #dedede;
+      border-radius: 999px;
+      background: #fff;
+      color: #555;
+      padding: 9px 20px;
+      min-width: 112px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 650;
+      cursor: pointer;
+      transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
+    }
+    .tab:hover { transform: translateY(-1px); }
+    .tab[aria-pressed="true"] {
+      background: #333;
+      border-color: #333;
+      color: #fff;
+    }
+    .open-original {
+      position: absolute;
+      right: 14px;
+      color: #777;
+      font-size: 12px;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .open-original:hover { text-decoration: underline; }
+    .frame-wrap { position: relative; flex: 1 1 auto; min-height: 0; }
+    iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #fff;
+    }
+    .loading {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      color: #888;
+      font-size: 13px;
+      background: #fff;
+      opacity: 0;
+      transition: opacity .2s ease;
+    }
+    .loading.show { opacity: 1; }
+    @media (max-width: 560px) {
+      .switcher { min-height: 54px; gap: 7px; padding: 7px 8px; }
+      .brand { display: none; }
+      .tab { min-width: 0; flex: 1; max-width: 150px; padding: 9px 10px; font-size: 13px; }
+      .open-original { position: static; font-size: 11px; margin-left: 2px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="switcher" aria-label="網站切換">
+    <span class="brand">POTATO × PTM</span>
+    <button class="tab" id="tab-potato" type="button" aria-pressed="true">Potato</button>
+    <button class="tab" id="tab-ptm" type="button" aria-pressed="false">PTM</button>
+    <a class="open-original" id="open-original" href="https://lionliontomato.github.io/potato/" target="_blank" rel="noopener">另開原網站 ↗</a>
+  </nav>
+  <main class="frame-wrap">
+    <iframe id="site-frame" title="Potato 網站內容" src="https://lionliontomato.github.io/potato/" allow="clipboard-read; clipboard-write"></iframe>
+    <div class="loading" id="loading">網頁載入中…</div>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+      const sites = {
+        potato: {
+          url: "https://lionliontomato.github.io/potato/",
+          label: "Potato",
+          title: "Potato 網站內容",
+          faviconCandidates: [
+            "https://lionliontomato.github.io/potato/favicon.ico",
+            "https://lionliontomato.github.io/potato/favicon.svg",
+            "https://lionliontomato.github.io/potato/favicon.png",
+            "https://lionliontomato.github.io/potato/assets/favicon.ico",
+            "https://lionliontomato.github.io/potato/assets/favicon.svg",
+            "https://lionliontomato.github.io/potato/images/favicon.png",
+            "https://lionliontomato.github.io/potato/apple-touch-icon.png"
+          ]
+        },
+        ptm: {
+          url: "https://lionliontomato.github.io/PTM/",
+          label: "PTM",
+          title: "PTM 網站內容",
+          faviconCandidates: [
+            "https://lionliontomato.github.io/PTM/favicon.ico",
+            "https://lionliontomato.github.io/PTM/favicon.svg",
+            "https://lionliontomato.github.io/PTM/favicon.png",
+            "https://lionliontomato.github.io/PTM/assets/favicon.ico",
+            "https://lionliontomato.github.io/PTM/assets/favicon.svg",
+            "https://lionliontomato.github.io/PTM/images/favicon.png",
+            "https://lionliontomato.github.io/PTM/apple-touch-icon.png"
+          ]
+        }
+      };
+
+      const frame = document.getElementById("site-frame");
+      const loading = document.getElementById("loading");
+      const favicon = document.getElementById("site-favicon");
+      const openOriginal = document.getElementById("open-original");
+      const tabs = {
+        potato: document.getElementById("tab-potato"),
+        ptm: document.getElementById("tab-ptm")
+      };
+      let activeKey = "potato";
+      let faviconProbeToken = 0;
+
+      function setFavicon(key) {
+        const token = ++faviconProbeToken;
+        const candidates = sites[key].faviconCandidates;
+        let index = 0;
+
+        function tryNext() {
+          if (token !== faviconProbeToken || index >= candidates.length) return;
+          const candidate = candidates[index++];
+          const probe = new Image();
+          probe.onload = function () {
+            if (token !== faviconProbeToken) return;
+            favicon.href = candidate;
+          };
+          probe.onerror = tryNext;
+          probe.src = candidate;
+        }
+        tryNext();
+      }
+
+      function switchSite(key) {
+        if (!sites[key] || key === activeKey) return;
+        activeKey = key;
+        const site = sites[key];
+        loading.classList.add("show");
+        frame.title = site.title;
+        frame.src = site.url;
+        openOriginal.href = site.url;
+        tabs.potato.setAttribute("aria-pressed", String(key === "potato"));
+        tabs.ptm.setAttribute("aria-pressed", String(key === "ptm"));
+        setFavicon(key);
+      }
+
+      frame.addEventListener("load", function () {
+        loading.classList.remove("show");
+      });
+      tabs.potato.addEventListener("click", function () { switchSite("potato"); });
+      tabs.ptm.addEventListener("click", function () { switchSite("ptm"); });
+      setFavicon("potato");
+    }());
+  </script>
+</body>
+</html>
